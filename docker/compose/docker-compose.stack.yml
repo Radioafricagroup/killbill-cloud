@@ -1,0 +1,70 @@
+version: "3.3"
+
+services:
+
+  killbill:
+    image: killbill/killbill:latest
+    ports:
+      - 8787:8080
+      - 12345:12345
+    environment:
+      - KILLBILL_CONFIG_DAO_URL=jdbc:mysql://dbserver:3306/killbill
+      - KILLBILL_CONFIG_DAO_USER=root
+      - KILLBILL_CONFIG_DAO_PASSWORD=root
+      - KILLBILL_SERVER_BASE_URL=http://killbill:8787
+      - KILLBILL_CONFIG_OSGI_DAO_URL=jdbc:mysql://dbserver:3306/killbill
+      - KILLBILL_CONFIG_OSGI_DAO_USER=root
+      - KILLBILL_CONFIG_OSGI_DAO_PASSWORD=root
+      - KILLBILL_PLUGIN_ANALYTICS=1
+      - KILLBILL_PLUGIN_STRIPE=1
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+
+  kaui:
+    image: killbill/kaui:latest
+    ports:
+      - 8989:8080
+    environment:
+      - KAUI_CONFIG_DAO_URL=jdbc:mysql://dbserver:3306/kaui
+      - KAUI_CONFIG_DAO_USER=root
+      - KAUI_CONFIG_DAO_PASSWORD=root
+      - KAUI_KILLBILL_URL=http://killbill:8080
+      - KAUI_KILLBILL_API_KEY=50caff33-9dd0-477f-a7e1-ef81b2cb6513
+      - KAUI_KILLBILL_API_SECRET=ONM6v1NuTgD1Qm1gO5eV1cHMUFpS1we9
+      - KAUI_CONFIG_DEMO=false
+      - KAUI_ROOT_USERNAME=admin
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+#  dbserver:
+#    image: killbill/mariadb:0.18
+#    volumes:
+#      - type: volume
+#        source: dbserver
+#        target: /var/lib/mysql
+#    ports:
+#      - 3306:3306
+#    environment:
+#      - MYSQL_ROOT_PASSWORD=root
+#    deploy:
+#      replicas: 1
+#      update_config:
+#        parallelism: 1
+#        delay: 10s
+#      restart_policy:
+#        condition: on-failure
+
+
+#volumes:
+# dbserver:
